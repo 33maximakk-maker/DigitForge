@@ -1,0 +1,65 @@
+<?php
+// digital_clock.php - Цифровые часы на PHP (веб-сервер)
+// Отдаёт страницу с HTML+JavaScript, так как PHP используется только для серверной части
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🕐 DigitForge - PHP</title>
+    <style>
+        *{margin:0;box-sizing:border-box;}body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Courier New',monospace;}
+        .clock-container{background:#000;padding:40px;border-radius:20px;box-shadow:0 0 40px #00ff00;text-align:center;}
+        .time{font-size:80px;font-weight:bold;color:#00ff00;letter-spacing:4px;text-shadow:0 0 20px #00ff00;}
+        .date{font-size:24px;color:#00ff00;margin-top:10px;font-family:Arial,sans-serif;}
+        .controls{margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+        .controls button,.controls input{padding:8px 16px;border:none;border-radius:6px;background:#2c3e50;color:white;cursor:pointer;font-size:14px;}
+        .controls button:hover{background:#34495e;}
+        .controls input[type="color"]{width:50px;height:40px;padding:0;background:none;}
+        .controls label{color:#00ff00;font-size:14px;display:flex;align-items:center;gap:5px;}
+    </style>
+</head>
+<body>
+<div class="clock-container" id="clockContainer">
+    <div class="time" id="timeDisplay">00:00:00</div>
+    <div class="date" id="dateDisplay">Понедельник, 1 Января 2024</div>
+    <div class="controls">
+        <button id="formatBtn">12/24 ч</button>
+        <button id="secondsBtn">Секунды</button>
+        <label>Цвет текста: <input type="color" id="textColorPicker" value="#00ff00"></label>
+        <label>Цвет фона: <input type="color" id="bgColorPicker" value="#000000"></label>
+    </div>
+</div>
+<script>
+    const timeDisplay=document.getElementById('timeDisplay');
+    const dateDisplay=document.getElementById('dateDisplay');
+    const clockContainer=document.getElementById('clockContainer');
+    const formatBtn=document.getElementById('formatBtn');
+    const secondsBtn=document.getElementById('secondsBtn');
+    const textColorPicker=document.getElementById('textColorPicker');
+    const bgColorPicker=document.getElementById('bgColorPicker');
+    let format24=true, showSeconds=true;
+
+    function updateClock(){
+        const now=new Date();
+        let hours=now.getHours(), minutes=now.getMinutes().toString().padStart(2,'0'), seconds=now.getSeconds().toString().padStart(2,'0');
+        let timeStr='';
+        if(format24){ timeStr=`${hours.toString().padStart(2,'0')}:${minutes}`; }
+        else{ const ampm=hours>=12?'PM':'AM'; hours=hours%12||12; timeStr=`${hours.toString().padStart(2,'0')}:${minutes}`; if(showSeconds) timeStr+=`:${seconds}`; timeStr+=` ${ampm}`; }
+        if(showSeconds && format24) timeStr+=`:${seconds}`;
+        timeDisplay.textContent=timeStr;
+        const days=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+        const months=['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+        dateDisplay.textContent=`${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+    function applyColors(){ const tc=textColorPicker.value, bc=bgColorPicker.value; clockContainer.style.backgroundColor=bc; timeDisplay.style.color=tc; timeDisplay.style.textShadow=`0 0 20px ${tc}`; dateDisplay.style.color=tc; document.querySelectorAll('.controls label').forEach(el=>el.style.color=tc); }
+    formatBtn.onclick=()=>{ format24=!format24; };
+    secondsBtn.onclick=()=>{ showSeconds=!showSeconds; };
+    textColorPicker.oninput=applyColors;
+    bgColorPicker.oninput=applyColors;
+    setInterval(updateClock,1000);
+    updateClock();
+    applyColors();
+</script>
+</body>
+</html>
